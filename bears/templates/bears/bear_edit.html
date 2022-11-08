@@ -1,0 +1,11 @@
+{% block content %}
+    <h1>Polar Bears: Bear Edit</h1>
+    <p>Bear id: {{ bear.id }}  
+        created: {{ bear.created_date }}
+
+    <form method="POST"> {% csrf_token %}
+      {{ form.as_p}}
+      <button type="submit" name="submit">Save</button>
+   </p>
+</form>
+    {% endblock %}
