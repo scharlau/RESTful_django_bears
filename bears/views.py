@@ -1,8 +1,7 @@
 from django.utils import timezone
 from django.shortcuts import redirect, render, get_object_or_404
-from rest_framework import status
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
-from rest_framework.decorators import api_view, APIView, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from .models import Bear, Sighting
 from .forms import BearForm
@@ -38,13 +37,13 @@ def bear_delete(request, id):
     bear.delete()
     return redirect('bear_list' )
 
-@api_view(['GET'])
-@renderer_classes([TemplateHTMLRenderer, JSONRenderer])
+@api_view(['GET']) # use this for function based views
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer]) #return either html or json
 def bear_list(request, format=None):
     bears = Bear.objects.all()
-    if request.accepted_renderer.format =='html':
+    if request.accepted_renderer.format =='html': # check for HTML
         return render(request, 'bears/bear_list.html', {'bears' : bears})
-    serializer = BearSerializer(bears, many=True)
+    serializer = BearSerializer(bears, many=True) # return JSON if html not requested
     data = serializer.data
     return Response(data)
 

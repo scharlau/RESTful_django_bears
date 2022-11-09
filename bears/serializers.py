@@ -7,6 +7,7 @@ class BearSerializer(serializers.HyperlinkedModelSerializer):
         model = Bear
         fields = ['id','bearID', 'pTT_ID', 'capture_lat', 'capture_long', 'sex', 'age_class', 'ear_applied', 'created_date']
 
+# As we have no views associated with sightings, we use a model serialiser
 class SightingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sighting
