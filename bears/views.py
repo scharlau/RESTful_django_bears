@@ -1,7 +1,12 @@
 from django.utils import timezone
 from django.shortcuts import redirect, render, get_object_or_404
+from rest_framework import status
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.decorators import api_view, APIView, renderer_classes
+from rest_framework.response import Response
 from .models import Bear, Sighting
 from .forms import BearForm
+from .serializers import BearSerializer, SightingSerializer
 
 def bear_new(request):
     if request.method=="POST":
@@ -33,15 +38,33 @@ def bear_delete(request, id):
     bear.delete()
     return redirect('bear_list' )
 
-def bear_list(request):
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer])
+def bear_list(request, format=None):
     bears = Bear.objects.all()
-    return render(request, 'bears/bear_list.html', {'bears' : bears})
+    if request.accepted_renderer.format =='html':
+        return render(request, 'bears/bear_list.html', {'bears' : bears})
+    serializer = BearSerializer(bears, many=True)
+    data = serializer.data
+    return Response(data)
 
 def females(request):
     females = Bear.female()
     return render(request, 'bears/bear_list.html', {'bears' : females})
 
+@api_view(['GET'])
+@renderer_classes([TemplateHTMLRenderer, JSONRenderer])
 def bear_detail(request, id):
     bear = get_object_or_404(Bear, id=id)
     sightings = Sighting.objects.filter(bear_id=id)
-    return render(request, 'bears/bear_detail.html', {'bear' : bear, 'sightings' : sightings})
+    if request.accepted_renderer.format=='html':
+        return render(request, 'bears/bear_detail.html', {'bear' : bear, 'sightings' : sightings})
+    serializerBear = BearSerializer(bear, context={'request': request})
+    serializerSighting = SightingSerializer(sightings, many=True, context={'request': request})
+    bear_data = serializerBear.data
+    sightings_data = serializerSighting.data
+    data = [bear_data, sightings_data]
+    return Response(data)
+
+       
+    

@@ -1,4 +1,5 @@
 from django.urls import path, include
+from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 urlpatterns = [
@@ -9,3 +10,5 @@ urlpatterns = [
         path('bear/<int:id>/edit/', views.bear_edit, name='bear_edit'),
         path('bear/<int:id>/delete/', views.bear_delete, name='bear_delete'),
         ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
