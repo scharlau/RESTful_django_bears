@@ -1,8 +1,11 @@
 # RESTful_django_bears
 This application focuses on creating a RESTful version of the previous polar bears in django with forms repository so that we can add various front ends to consume JSON data. As before, this is an example of how you might do a RESTful application with Django.
 
+Most of this repository is a regular 'django app'. There is also a 'frontend' folder, which holds the javascript front end of this two part application. First, we build the backend with django. Second, we build the frontend javascript components.
+
 The goal of this session is to show how to run an application that serves both the HTML as before, plus, the JSON that can be consumed by another application.
 
+## Start with the backend
 Start with the basics, pull down the repo and then set up your python envivonment and ensure Django is ready for use. 
 
         pyenv local 3.10.7 # this sets the local version of python to 3.10.7
@@ -124,6 +127,39 @@ You can then open a terminal and use either curl if you're on linux or a MacOS. 
 The first should return the list of all bears, while the second should give you the details for bear 5 (possibly deploy_id: 20446) and the associated sightings. Any error should appear in the terminal, plus the terminal showing the django output too.
 
 ## Now we need a front-end to consume the JSON
-We can build a small Javascript front end to consume our JSON
+We can build a small Javascript front end to consume our JSON. In order to do this we need to modify our backend again, and to possibly put some basic development tooling in place.
+
+### Add support for cross origin resource sharing (CORS)
+We need another library to be added to our django backend so that we can call the JSON parts from another application server. We didn't experience this before as we were only calling the pages from our own server. We'll use https://pypi.org/project/django-cors-headers/ for this, which we install with the command:
+
+        pip install django-cors-headers
+
+Then modify the polar_bear/settings.py file as follows to finish configuration.
+
+1. Edit the INSTALLED_APPS by adding this to the list:
+
+        "corsheaders",
+
+2. Add these these two items to the MIDDLEWARE section:
+
+        MIDDLEWARE = [
+            ...,
+            "corsheaders.middleware.CorsMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            ...,
+        ]
+
+3. Add allowed access for calls into the system. You can use a wildcard to allow anything, but it is safer to specify the specific locations that you expect as we do with this addition. You can add this below your middleware section:
+
+        CORS_ALLOWED_ORIGINS = [
+            "http://localhost:8080",
+        ]
+
+Now you can resart the server.
+
+
+
+Add static folder with css and js folders too.
+
 
 
