@@ -11,4 +11,4 @@ urlpatterns = [
         path('bear/<int:id>/delete/', views.bear_delete, name='bear_delete'),
         ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'html'])

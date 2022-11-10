@@ -47,7 +47,7 @@ Open the bears/urls.py file and add this line as an import:
 
 Next, add this line at the end of the file in order to map views to json output.
 
-        urlpatterns = format_suffix_patterns(urlpatterns)
+        urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'html'])
 
 With this in place we can now start to modify the bears application.
 

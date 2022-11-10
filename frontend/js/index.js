@@ -2,7 +2,7 @@
 var request = new XMLHttpRequest()
 
 // Open a new connection, using the GET request on the URL endpoint
-request.open('GET', 'http://localhost:8000/bears/bear_list.json/', true)
+request.open('GET', 'http://localhost:8000/?format=json', true)
 
 request.onload = function () {
   // Begin accessing JSON data here
@@ -10,7 +10,7 @@ var data = JSON.parse(this.response)
 
 data.forEach(bear => {
   // Log each movie's title
-  console.log(bear.id)
+  console.log(bear.id, bear.bearID)
 })
 
 }
