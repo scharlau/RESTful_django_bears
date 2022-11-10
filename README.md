@@ -129,6 +129,20 @@ The first should return the list of all bears, while the second should give you 
 ## Now we need a front-end to consume the JSON
 We can build a small Javascript front end to consume our JSON. In order to do this we need to modify our backend again, and to possibly put some basic development tooling in place.
 
+First, add the Node Version Manager if you don't have that already. This will allow you to run a small http server hosting the Javascript frontend alongside Django running the backend. You can go to either https://github.com/nvm-sh/nvm or use https://nodejs.org/en/. 
+
+Maybe, like me, you find that you use Node irregularly, so it's time to update things. You can do that from the terminal with this command:
+
+        nvm install node --reinstall-packages-from=node
+
+Second, with NVM in place, we can now add http-server https://www.npmjs.com/package/http-server to drive the frontend application that pulls JSON from our Django backend. You can install/launch it simply with the command:
+
+        nvm http-server -c-1
+
+I found that adding the -c-1 flags meant it stopped (made it less likely) that my browser would cache the html and js source files. Otherwise, I'm spending too long dumping the cache from the browser each time I make an edit of the html or js files.
+
+http-server will start a service on a different port than Django, so this is fine, and you can then load your frontend application there.
+
 ### Add support for cross origin resource sharing (CORS)
 We need another library to be added to our django backend so that we can call the JSON parts from another application server. We didn't experience this before as we were only calling the pages from our own server. We'll use https://pypi.org/project/django-cors-headers/ for this, which we install with the command:
 
@@ -157,9 +171,103 @@ Then modify the polar_bear/settings.py file as follows to finish configuration.
 
 Now you can resart the server.
 
+### Creating the index page
+We want to have a basic html file to load the javascript content as JSON. We can do that like this. Create an index.html file in the 'frontend' folder with this content:
 
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-Add static folder with css and js folders too.
+            <title>Bear App</title>
+            <link href="css/style.css" rel="stylesheet" />
+        </head>
 
+        <body>
+            <h1>Bear App</h1>
+            <div id="root"></div>
+            <script src="js/index.js"></script>
+        </body>
+        </html>
 
+Next, add a 'frontend/css' folder with a styles.css file. That file can hold this code:
 
+        body {
+            background-color: white;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        
+        h1 {
+            color: black;
+            text-align: center;
+        }
+        
+        p {
+            font-family: verdana;
+            font-size: 12px;
+        }
+
+Hopefully, none of this is a surprise, and it should be clear that this will be basic, but functional.
+
+Now we can add a 'frontend/js' folder with an index.js file to do the work pulling the JSON from our Django application so that we can see some bears. In the index.js file you can add this code:
+
+        const app = document.getElementById('root')
+
+        const container = document.createElement('div')
+        container.setAttribute('class', 'container')
+
+        app.appendChild(container)
+
+        // Create a request variable and assign a new XMLHttpRequest object to it.
+        var request = new XMLHttpRequest()
+
+        // Open a new connection, using the GET request on the URL endpoint
+        request.open('GET', 'http://localhost:8000/?format=json', true)
+
+        request.onload = function () {
+        // Begin accessing JSON data here
+        var data = JSON.parse(this.response)
+        if (request.status >= 200 && request.status < 400) {
+            data.forEach(bear => {
+            const card = document.createElement('div')
+            card.setAttribute('class', 'card')
+
+            const h2 = document.createElement('h2')
+            h2.textContent = bear.bearID
+
+            const p = document.createElement('p')
+            bear.id = bear.id
+            p.textContent = `This is a ${ bear.age_class} aged bear 
+            ${bear.bearID}, a ${ bear.sex } bear, who has has an tag in its' ${bear.ear_applied } ear, 
+            with ${bear.pTT_ID } device, and was
+            tagged at ${ bear.capture_lat } and ${ bear.capture_long }`
+
+            container.appendChild(card)
+            card.appendChild(h2)
+            card.appendChild(p)
+            })
+        } else {
+            const errorMessage = document.createElement('marquee')
+            errorMessage.textContent = `Gah, it's not working!`
+            app.appendChild(errorMessage)
+        }
+        }
+
+        // Send request
+        request.send()
+
+This code uses the DOM of the page to dynamically add a container to the root, and then add each bear as a card into that container. The JSON is pulled from the Django app by using the ?format=json parameter in the URL request.
+
+## Going Further
+This app only touches the basics. You now know how to convert a current Django app into a RESTful one. You also know how to create a Javascript frontend to consume the JSON generated by your backend. 
+
+This example still leaves more waiting to be done, depending upon your focus. These fall into three key areas:
+1. You can build out more of the backend so that you can add new bears, and/or sightings, plus a means to edit, or delete entries. You would probably want to add some authentication for this too. 
+2. There is more that could be done on the frontend so that we can browse bears and their associated sightings. 
+3. Lastly, the code for the backend is mixed up: the methods to produce JSON sit alongside the methods to produce HTML. It might be worthwhile exploring how to separate the two of them more fully. This leads to more questions:
+    1. Should the models and the database be in a separate app, with the JSON API and HTML being in two separate apps?
+    2. If the bear models are separated out, then much code for JSON and HTML will still be similar, but the endpoints can be done differently - more consistently.
+
+Hopefully this has helped you. 

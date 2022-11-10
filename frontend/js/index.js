@@ -1,14 +1,9 @@
 const app = document.getElementById('root')
 
-const logo = document.createElement('img')
-logo.src = 'logo.png'
-
 const container = document.createElement('div')
 container.setAttribute('class', 'container')
 
-app.appendChild(logo)
 app.appendChild(container)
-
 
 // Create a request variable and assign a new XMLHttpRequest object to it.
 var request = new XMLHttpRequest()
@@ -24,8 +19,8 @@ if (request.status >= 200 && request.status < 400) {
       const card = document.createElement('div')
       card.setAttribute('class', 'card')
 
-      const h1 = document.createElement('h1')
-      h1.textContent = bear.bearID
+      const h2 = document.createElement('h2')
+      h2.textContent = bear.bearID
 
       const p = document.createElement('p')
       bear.id = bear.id
@@ -35,7 +30,7 @@ if (request.status >= 200 && request.status < 400) {
       tagged at ${ bear.capture_lat } and ${ bear.capture_long }`
 
       container.appendChild(card)
-      card.appendChild(h1)
+      card.appendChild(h2)
       card.appendChild(p)
     })
   } else {
