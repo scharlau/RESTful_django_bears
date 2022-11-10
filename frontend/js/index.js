@@ -1,3 +1,15 @@
+const app = document.getElementById('root')
+
+const logo = document.createElement('img')
+logo.src = 'logo.png'
+
+const container = document.createElement('div')
+container.setAttribute('class', 'container')
+
+app.appendChild(logo)
+app.appendChild(container)
+
+
 // Create a request variable and assign a new XMLHttpRequest object to it.
 var request = new XMLHttpRequest()
 
@@ -7,12 +19,30 @@ request.open('GET', 'http://localhost:8000/?format=json', true)
 request.onload = function () {
   // Begin accessing JSON data here
 var data = JSON.parse(this.response)
+if (request.status >= 200 && request.status < 400) {
+    data.forEach(bear => {
+      const card = document.createElement('div')
+      card.setAttribute('class', 'card')
 
-data.forEach(bear => {
-  // Log each movie's title
-  console.log(bear.id, bear.bearID)
-})
+      const h1 = document.createElement('h1')
+      h1.textContent = bear.bearID
 
+      const p = document.createElement('p')
+      bear.id = bear.id
+      p.textContent = `This is a ${ bear.age_class} aged bear 
+      ${bear.bearID}, a ${ bear.sex } bear, who has has an tag in its' ${bear.ear_applied } ear, 
+      with ${bear.pTT_ID } device, and was
+      tagged at ${ bear.capture_lat } and ${ bear.capture_long }`
+
+      container.appendChild(card)
+      card.appendChild(h1)
+      card.appendChild(p)
+    })
+  } else {
+    const errorMessage = document.createElement('marquee')
+    errorMessage.textContent = `Gah, it's not working!`
+    app.appendChild(errorMessage)
+  }
 }
 
 // Send request
